@@ -172,10 +172,13 @@ const AIChatbot: React.FC = () => {
         const text = result.text;
         if (text) {
              try {
-                responseData = JSON.parse(text);
+                // Strip markdown code blocks if present (e.g. ```json ... ```)
+                const cleanedText = text.replace(/```json/g, '').replace(/```/g, '').trim();
+                responseData = JSON.parse(cleanedText);
              } catch (jsonError) {
                 console.error("JSON Parse Error", jsonError);
-                responseData = { text: text }; // Fallback if model outputs raw text
+                // Try to use the raw text if parsing fails, assuming the model just chatted normally
+                responseData = { text: text }; 
              }
         }
       } else {
