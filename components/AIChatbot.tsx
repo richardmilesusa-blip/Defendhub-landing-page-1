@@ -79,12 +79,15 @@ const AIChatbot: React.FC = () => {
   useEffect(() => {
     const initChat = async () => {
       try {
-        if (!process.env.API_KEY) {
+        // Safely check for API key avoiding ReferenceError if process is undefined
+        const apiKey = typeof process !== 'undefined' ? process.env.API_KEY : undefined;
+
+        if (!apiKey) {
           console.error("API_KEY is missing");
           return;
         }
 
-        const ai = new GoogleGenAI({ apiKey: process.env.API_KEY });
+        const ai = new GoogleGenAI({ apiKey });
         
         chatSessionRef.current = ai.chats.create({
           model: 'gemini-3-pro-preview',
