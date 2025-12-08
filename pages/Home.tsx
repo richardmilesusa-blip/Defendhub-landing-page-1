@@ -210,12 +210,12 @@ const Home: React.FC = () => {
                     <div className="p-6 flex-1 flex flex-col font-mono text-xs text-green-500/80 overflow-hidden relative">
                         <div className="absolute inset-0 bg-[linear-gradient(transparent_50%,rgba(0,255,0,0.05)_50%)] bg-[size:100%_4px] pointer-events-none" />
                         <motion.div style={{ opacity: contentOpacity, y: contentY }} className="space-y-2">
-                            <p>> INITIALIZING DEFENSE PROTOCOLS...</p>
-                            <p className="text-white">> CONNECTION ESTABLISHED</p>
-                            <p>> SCANNING SECTOR 7G...</p>
-                            <p className="text-cyber-red">> THREAT LEVEL: NULL</p>
-                            <p>> QUANTUM ENCRYPTION: ACTIVE</p>
-                            <p>> ZERO TRUST: ENFORCED</p>
+                            <p>&gt; INITIALIZING DEFENSE PROTOCOLS...</p>
+                            <p className="text-white">&gt; CONNECTION ESTABLISHED</p>
+                            <p>&gt; SCANNING SECTOR 7G...</p>
+                            <p className="text-cyber-red">&gt; THREAT LEVEL: NULL</p>
+                            <p>&gt; QUANTUM ENCRYPTION: ACTIVE</p>
+                            <p>&gt; ZERO TRUST: ENFORCED</p>
                             <br/>
                             <div className="grid grid-cols-4 gap-1 opacity-50">
                                 {Array.from({ length: 16 }).map((_, i) => (
