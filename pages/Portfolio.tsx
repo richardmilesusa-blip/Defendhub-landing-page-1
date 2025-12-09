@@ -88,31 +88,37 @@ const Portfolio: React.FC = () => {
               animate={{ opacity: 1, scale: 1 }}
               exit={{ opacity: 0, scale: 0.8 }}
               transition={{ duration: 0.8, type: "spring" }}
-              className="group relative h-96 cursor-pointer overflow-hidden border border-white/10 bg-neutral-900"
             >
-              <img 
-                src={project.image} 
-                alt={project.title} 
-                className="absolute inset-0 w-full h-full object-cover transition-transform duration-700 group-hover:scale-110 opacity-60 group-hover:opacity-40" 
-              />
-              
-              <div className="absolute inset-0 bg-gradient-to-t from-black via-black/50 to-transparent p-6 flex flex-col justify-end">
-                <span className="text-cyber-red font-mono text-xs mb-2 tracking-widest">{project.category}</span>
-                <h3 className="text-3xl font-display font-bold mb-4 text-white">{project.title}</h3>
+              <Link to={`/portfolio/${project.id}`} className="block h-96 group relative cursor-pointer overflow-hidden border border-white/10 bg-neutral-900">
+                <img 
+                  src={project.image} 
+                  alt={project.title} 
+                  className="absolute inset-0 w-full h-full object-cover transition-transform duration-700 group-hover:scale-110 opacity-60 group-hover:opacity-40" 
+                />
                 
-                <div className="grid grid-cols-2 gap-4 border-t border-white/20 pt-4 translate-y-full opacity-0 group-hover:translate-y-0 group-hover:opacity-100 transition-all duration-300">
-                  {project.stats.map((stat, i) => (
-                    <div key={i}>
-                      <div className="text-xs text-gray-500 font-mono">{stat.label}</div>
-                      <div className="text-white font-bold">{stat.value}</div>
-                    </div>
-                  ))}
+                <div className="absolute inset-0 bg-gradient-to-t from-black via-black/50 to-transparent p-6 flex flex-col justify-end">
+                  <span className="text-cyber-red font-mono text-xs mb-2 tracking-widest">{project.category}</span>
+                  <h3 className="text-3xl font-display font-bold mb-4 text-white">{project.title}</h3>
+                  
+                  <div className="grid grid-cols-2 gap-4 border-t border-white/20 pt-4 translate-y-full opacity-0 group-hover:translate-y-0 group-hover:opacity-100 transition-all duration-300">
+                    {project.stats.map((stat, i) => (
+                      <div key={i}>
+                        <div className="text-xs text-gray-500 font-mono">{stat.label}</div>
+                        <div className="text-white font-bold">{stat.value}</div>
+                      </div>
+                    ))}
+                  </div>
                 </div>
-              </div>
 
-              {/* Decorative corners */}
-              <div className="absolute top-0 left-0 w-4 h-4 border-t-2 border-l-2 border-cyber-red opacity-0 group-hover:opacity-100 transition-opacity" />
-              <div className="absolute bottom-0 right-0 w-4 h-4 border-b-2 border-r-2 border-cyber-red opacity-0 group-hover:opacity-100 transition-opacity" />
+                {/* Decorative corners */}
+                <div className="absolute top-0 left-0 w-4 h-4 border-t-2 border-l-2 border-cyber-red opacity-0 group-hover:opacity-100 transition-opacity" />
+                <div className="absolute bottom-0 right-0 w-4 h-4 border-b-2 border-r-2 border-cyber-red opacity-0 group-hover:opacity-100 transition-opacity" />
+                
+                {/* View Detail Prompt */}
+                <div className="absolute top-4 right-4 bg-cyber-red/10 border border-cyber-red px-2 py-1 text-[10px] text-cyber-red font-mono opacity-0 group-hover:opacity-100 transition-opacity">
+                    VIEW LOG &gt;
+                </div>
+              </Link>
             </motion.div>
           ))}
         </AnimatePresence>
