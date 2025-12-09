@@ -9,10 +9,14 @@ const Contact: React.FC = () => {
   const location = useLocation();
 
   useEffect(() => {
-    // Check if state was passed via Link (e.g. from Services page)
-    const state = location.state as { selectedService?: string } | null;
-    if (state && state.selectedService) {
-      setFormState(prev => ({ ...prev, service: state.selectedService || '' }));
+    // Check if state was passed via Link (e.g. from Services or Portfolio page)
+    const state = location.state as { selectedService?: string; message?: string } | null;
+    if (state) {
+        setFormState(prev => ({ 
+            ...prev, 
+            service: state.selectedService || prev.service,
+            message: state.message || prev.message
+        }));
     }
   }, [location]);
 

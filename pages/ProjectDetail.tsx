@@ -1,7 +1,7 @@
 import React, { useEffect } from 'react';
 import { useParams, Link } from 'react-router-dom';
 import { motion } from 'framer-motion';
-import { ArrowLeft, Terminal, Shield, Cpu, Lock, CheckCircle, AlertTriangle, FileText } from 'lucide-react';
+import { ArrowLeft, Terminal, Shield, Lock, AlertTriangle, FileText } from 'lucide-react';
 
 // Mock Data Database for Case Studies
 const projectDatabase: Record<string, any> = {
@@ -144,6 +144,9 @@ const ProjectDetail: React.FC = () => {
     );
   }
 
+  // Construct the pre-filled message for the contact form
+  const prefillMessage = `REF: CASE LOG [${project.title}]\n\nI am interested in discussing a security architecture similar to this case study. Our organization operates in the ${project.category} sector and requires...`;
+
   return (
     <div className="min-h-screen bg-black pt-20">
       
@@ -275,7 +278,13 @@ const ProjectDetail: React.FC = () => {
                   </div>
               </div>
 
-              <Link to="/contact">
+              <Link 
+                to="/contact" 
+                state={{ 
+                    message: prefillMessage, 
+                    selectedService: 'General Inquiry' 
+                }}
+              >
                   <button className="w-full py-4 bg-cyber-red text-black font-bold font-display tracking-wider hover:bg-white transition-colors flex items-center justify-center gap-2">
                       <Lock size={16} /> REQUEST SIMILAR
                   </button>
