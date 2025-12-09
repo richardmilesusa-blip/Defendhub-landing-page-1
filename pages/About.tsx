@@ -45,7 +45,7 @@ const About: React.FC = () => {
           <div className="absolute bottom-10 left-10">
             <div className="flex items-center gap-2 text-cyber-red mb-2">
               <MapPin className="w-5 h-5" />
-              <span className="font-mono">LAGOS, NIGERIA</span>
+              <span className="font-mono">KANO, NIGERIA</span>
             </div>
             <h3 className="text-2xl font-bold text-white">HEADQUARTERS</h3>
           </div>

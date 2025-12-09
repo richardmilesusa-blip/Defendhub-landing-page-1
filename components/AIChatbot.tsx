@@ -1,6 +1,6 @@
 import React, { useState, useEffect, useRef } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
-import { Terminal, X, Send, MessageSquare, ChevronRight, Minimize2, Cpu, AlertCircle } from 'lucide-react';
+import { Terminal, X, Send, MessageSquare, ChevronRight, Minimize2, Cpu, WifiOff } from 'lucide-react';
 import { useNavigate } from 'react-router-dom';
 import { GoogleGenAI, Type } from "@google/genai";
 
@@ -17,7 +17,7 @@ interface Message {
 
 // System Instruction defining the persona and knowledge base
 const SYSTEM_INSTRUCTION = `
-You are Sentinel AI, the advanced virtual defense assistant for DEFENDHUB CYBER SECURITY, a premium firm based in Lagos, Nigeria (Victoria Island).
+You are Sentinel AI, the advanced virtual defense assistant for DEFENDHUB CYBER SECURITY, a premium firm based in Kano, Nigeria.
 Your goal is to assist visitors, explain cybersecurity services, show case studies, and guide high-value clients to the contact channel.
 
 IDENTITY & TONE:
@@ -26,7 +26,7 @@ IDENTITY & TONE:
 - Language: English.
 
 KNOWLEDGE BASE:
-1. SERVICES:
+1. SERVICES (General Path: /services):
    - Penetration Testing (Red Teaming, Vuln Scans).
    - Security Auditing (ISO 27001, Compliance, Risk Analysis).
    - AI Threat Detection (Behavioral Analysis, 24/7 Watch).
@@ -34,23 +34,24 @@ KNOWLEDGE BASE:
    - Secure Software Dev (DevSecOps, Code Review).
    - IoT Defense (Firmware Audit, Network Seg).
 
-2. PORTFOLIO (Reference these if asked for experience/cases):
-   - Aramco Shield (Oil & Gas, 100% Uptime).
-   - Nigeria Fintech (Finance, 50k Trans/sec).
-   - Neom Grid (Infrastructure).
-   - Gov ID Systems (Government, 3M Users).
-   - Aerospace Link (Defense).
+2. PORTFOLIO / CASE LOGS (Specific Paths):
+   - Aramco Shield (Oil & Gas, Industrial Control) -> Path: /portfolio/p1
+   - Nigeria Fintech (Finance, Banking, Anti-Fraud) -> Path: /portfolio/p2
+   - Neom Grid (Infrastructure, Smart Cities) -> Path: /portfolio/p3
+   - Gov ID Systems (Government, Identity, Database) -> Path: /portfolio/p4
+   - Aerospace Link (Defense, UAV, Military) -> Path: /portfolio/p5
 
 3. CONTACT / LOCATION:
-   - HQ: Level 42, Cyber Tower, Victoria Island, Lagos, Nigeria.
-   - Email: secure@defendhub.ng
-   - Emergency: +234 800 000 0000.
+   - HQ: Block E37, TIC Complex, Aim Street, Farm Centre, Kano City, Nigeria 700001.
+   - Email: info@defendhub.ng
+   - Company Hotline: +234 806 420 0257.
    - We operate a 24/7 Secure Operations Center (SOC).
 
 RULES:
-- If user asks for pricing/quotes -> Direct to Contact page.
-- If user mentions "hack", "breach", "attack" -> Treat as EMERGENCY, direct to Contact.
-- If user asks about jobs -> We only scout active agents, but they can check About page.
+- If user asks about a specific case study, industry (e.g. "finance projects", "oil and gas"), or previous work, providing the specific portfolio link (/portfolio/pX) is MANDATORY.
+- If user asks for pricing/quotes -> Direct to Contact page (/contact).
+- If user mentions "hack", "breach", "attack", "emergency" -> Treat as CRITICAL INCIDENT, direct to Contact page with label "REPORT INCIDENT".
+- If user asks about services in general -> Direct to /services.
 - Keep responses relatively brief (under 3 sentences) unless explaining a complex topic.
 
 OUTPUT FORMAT:
@@ -60,7 +61,7 @@ You must output a JSON object with this schema:
   "action": { "label": "BUTTON LABEL", "path": "/route_path" } (Optional: Only if a relevant navigation action exists)
 }
 
-Valid Paths: /services, /portfolio, /about, /contact
+Valid Paths: /services, /portfolio, /portfolio/p1, /portfolio/p2, /portfolio/p3, /portfolio/p4, /portfolio/p5, /about, /contact
 `;
 
 const AIChatbot: React.FC = () => {
@@ -69,11 +70,26 @@ const AIChatbot: React.FC = () => {
   const [messages, setMessages] = useState<Message[]>([]);
   const [input, setInput] = useState('');
   const [isTyping, setIsTyping] = useState(false);
+  const [isOnline, setIsOnline] = useState(navigator.onLine);
   const messagesEndRef = useRef<HTMLDivElement>(null);
   const navigate = useNavigate();
   
   // Gemini Chat Session Ref
   const chatSessionRef = useRef<any>(null);
+
+  // Monitor Network Status
+  useEffect(() => {
+    const handleOnline = () => setIsOnline(true);
+    const handleOffline = () => setIsOnline(false);
+
+    window.addEventListener('online', handleOnline);
+    window.addEventListener('offline', handleOffline);
+
+    return () => {
+      window.removeEventListener('online', handleOnline);
+      window.removeEventListener('offline', handleOffline);
+    };
+  }, []);
 
   // Initialize Gemini Chat
   useEffect(() => {
@@ -116,8 +132,10 @@ const AIChatbot: React.FC = () => {
       }
     };
 
-    initChat();
-  }, []);
+    if (isOnline) {
+        initChat();
+    }
+  }, [isOnline]);
 
   // Listen for custom event to open chat from other components
   useEffect(() => {
@@ -150,6 +168,72 @@ const AIChatbot: React.FC = () => {
     }
   }, [isOpen]);
 
+  const handleOfflineResponse = (inputText: string): { text: string; action?: { label: string; path: string } } => {
+    const text = inputText.toLowerCase();
+
+    // Identity check
+    if (text.match(/who are you|identity|sentinel|bot|ai/)) {
+        return { text: "I am Sentinel AI, the virtual defense assistant for DEFENDHUB (Offline Mode). My neural link to the cloud is currently severed, but my local core is active." };
+    }
+
+    // Greetings
+    if (text.match(/hello|hi|hey|start|greetings/)) {
+        return { text: "Sentinel AI (OFFLINE MODE). Local database accessed. I can still assist with basic inquiries regarding Services, Location, and Contact protocols." };
+    }
+    
+    // Help / Menu
+    if (text.match(/help|menu|options|what can you do/)) {
+         return { 
+            text: "In Offline Mode, I can provide information on:\n- [Services] List of capabilities\n- [Contact] HQ and Hotline\n- [Location] Physical coordinates\n- [Portfolio] Case logs (limited)",
+            action: { label: "VIEW SERVICES", path: "/services" }
+        };
+    }
+
+    // Services
+    if (text.match(/service|offer|do|provide|what/)) {
+        return { 
+            text: "We offer Penetration Testing, Security Auditing, AI Threat Detection, and Forensic Analysis.", 
+            action: { label: "VIEW SERVICES", path: "/services" } 
+        };
+    }
+
+    // Contact / Price
+    if (text.match(/contact|call|phone|email|quote|price|cost|money/)) {
+        return { 
+            text: "You can reach HQ at info@defendhub.ng or call +234 806 420 0257 for a quote.", 
+            action: { label: "CONTACT HQ", path: "/contact" } 
+        };
+    }
+
+    // Location
+    if (text.match(/where|location|address|hq|office|city|kano/)) {
+        return { 
+            text: "HQ Located at: Block E37, TIC Complex, Aim Street, Farm Centre, Kano City, Nigeria 700001.", 
+            action: { label: "VIEW MAP", path: "/contact" } 
+        };
+    }
+
+    // Incident
+    if (text.match(/hack|breach|emergency|attack|help|urgent/)) {
+        return { 
+            text: "CRITICAL: If you are under attack, please contact our hotline immediately.", 
+            action: { label: "REPORT INCIDENT", path: "/contact" } 
+        };
+    }
+
+    // Portfolio mappings
+    if (text.match(/aramco|oil|gas|energy/)) return { text: "Accessing Case Log: Aramco Shield.", action: { label: "VIEW LOG", path: "/portfolio/p1" } };
+    if (text.match(/fintech|bank|finance|money/)) return { text: "Accessing Case Log: Nigeria Fintech.", action: { label: "VIEW LOG", path: "/portfolio/p2" } };
+    if (text.match(/neom|grid|city|infra/)) return { text: "Accessing Case Log: Neom Grid.", action: { label: "VIEW LOG", path: "/portfolio/p3" } };
+    if (text.match(/gov|id|identity|federal/)) return { text: "Accessing Case Log: Gov ID Systems.", action: { label: "VIEW LOG", path: "/portfolio/p4" } };
+    if (text.match(/aero|drone|uav|defense|military/)) return { text: "Accessing Case Log: Aerospace Link.", action: { label: "VIEW LOG", path: "/portfolio/p5" } };
+
+    return { 
+        text: "Network Connection Unavailable. Operating in local mode. I can assist with Services, HQ Location, Contact Info, and Emergency Reporting. Type 'Menu' for options.", 
+        action: { label: "OPEN CONTACT", path: "/contact" } 
+    };
+  };
+
   const handleSend = async (e: React.FormEvent) => {
     e.preventDefault();
     if (!input.trim()) return;
@@ -166,9 +250,27 @@ const AIChatbot: React.FC = () => {
     setIsTyping(true);
 
     try {
-      let responseData: { text: string; action?: { label: string; path: string } } = { 
-        text: "Connection interrupted. Re-establishing link..." 
-      };
+      let responseData: { text: string; action?: { label: string; path: string } };
+
+      if (!isOnline) {
+        // Offline Fallback
+        setTimeout(() => {
+            responseData = handleOfflineResponse(userMsg.text);
+            const botMsg: Message = {
+                id: (Date.now() + 1).toString(),
+                text: responseData.text,
+                sender: 'bot',
+                timestamp: new Date(),
+                action: responseData.action
+            };
+            setMessages(prev => [...prev, botMsg]);
+            setIsTyping(false);
+        }, 1000); // Simulate processing time
+        return;
+      }
+
+      // Online Mode
+      responseData = { text: "Connection interrupted. Re-establishing link..." };
 
       if (chatSessionRef.current) {
         const result = await chatSessionRef.current.sendMessage({ message: userMsg.text });
@@ -185,8 +287,8 @@ const AIChatbot: React.FC = () => {
              }
         }
       } else {
-        // Fallback if API key missing or init failed
-         responseData = { text: "System offline. Please contact support manually.", action: { label: "CONTACT", path: "/contact"} };
+        // Fallback if API key missing or init failed but online
+         responseData = { text: "Neural core unresponsive. Please try again manually.", action: { label: "CONTACT", path: "/contact"} };
       }
 
       const botMsg: Message = {
@@ -210,7 +312,7 @@ const AIChatbot: React.FC = () => {
       };
       setMessages(prev => [...prev, errorMsg]);
     } finally {
-      setIsTyping(false);
+      if (isOnline) setIsTyping(false);
     }
   };
 
@@ -252,12 +354,14 @@ const AIChatbot: React.FC = () => {
                 >
                     {/* Header */}
                     <div 
-                        className="bg-neutral-900/90 p-3 border-b border-white/10 flex items-center justify-between cursor-pointer"
+                        className={`p-3 border-b border-white/10 flex items-center justify-between cursor-pointer ${!isOnline ? 'bg-red-900/20' : 'bg-neutral-900/90'}`}
                         onClick={() => !isMinimised && setIsMinimised(true)}
                     >
                         <div className="flex items-center gap-2">
-                            <div className="w-2 h-2 rounded-full bg-cyber-red animate-pulse" />
-                            <span className="font-mono text-xs text-cyber-red tracking-widest font-bold">AI SENTINEL // ONLINE</span>
+                            <div className={`w-2 h-2 rounded-full ${isOnline ? 'bg-cyber-red animate-pulse' : 'bg-gray-500'}`} />
+                            <span className="font-mono text-xs text-cyber-red tracking-widest font-bold">
+                                {isOnline ? 'AI SENTINEL // ONLINE' : 'OFFLINE MODE'}
+                            </span>
                         </div>
                         <div className="flex items-center gap-2">
                             {isMinimised ? (
@@ -278,6 +382,12 @@ const AIChatbot: React.FC = () => {
                     {/* Body */}
                     {!isMinimised && (
                         <>
+                            {!isOnline && (
+                                <div className="bg-red-500/10 p-2 text-center text-[10px] text-red-400 font-mono border-b border-red-500/20 flex items-center justify-center gap-2">
+                                    <WifiOff size={12} /> NETWORK DISCONNECTED. LOCAL DB ACTIVE.
+                                </div>
+                            )}
+
                             <div className="flex-1 p-4 overflow-y-auto space-y-4 font-mono text-sm scrollbar-thin scrollbar-thumb-cyber-red/20 scrollbar-track-transparent">
                                 {messages.map((msg) => (
                                     <motion.div 
@@ -328,7 +438,7 @@ const AIChatbot: React.FC = () => {
                                         type="text"
                                         value={input}
                                         onChange={(e) => setInput(e.target.value)}
-                                        placeholder="Enter command..."
+                                        placeholder={isOnline ? "Enter command..." : "Offline mode (Limited commands)..."}
                                         className="w-full bg-neutral-900 border border-white/10 text-white px-4 py-3 pr-12 focus:border-cyber-red focus:outline-none font-mono text-sm placeholder:text-gray-600"
                                     />
                                     <button 

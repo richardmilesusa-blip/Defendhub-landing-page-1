@@ -1,11 +1,12 @@
 import React, { useState, useEffect } from 'react';
-import { motion } from 'framer-motion';
-import { Send, MapPin, Phone, Mail, MessageCircle, ChevronDown } from 'lucide-react';
+import { motion, AnimatePresence } from 'framer-motion';
+import { Send, MapPin, Phone, Mail, MessageCircle, ChevronDown, Check } from 'lucide-react';
 import { useLocation } from 'react-router-dom';
 
 const Contact: React.FC = () => {
   const [formState, setFormState] = useState({ name: '', email: '', service: '', message: '' });
   const [isSubmitting, setIsSubmitting] = useState(false);
+  const [isSuccess, setIsSuccess] = useState(false);
   const location = useLocation();
 
   useEffect(() => {
@@ -26,8 +27,13 @@ const Contact: React.FC = () => {
     // Simulate API call
     setTimeout(() => {
       setIsSubmitting(false);
-      alert('TRANSMISSION RECEIVED. WE WILL CONTACT YOU.');
+      setIsSuccess(true);
       setFormState({ name: '', email: '', service: '', message: '' });
+      
+      // Hide success message after a few seconds
+      setTimeout(() => {
+        setIsSuccess(false);
+      }, 4000);
     }, 2000);
   };
 
@@ -52,7 +58,11 @@ const Contact: React.FC = () => {
               </div>
               <div>
                 <h4 className="text-xl font-bold mb-1">HQ Location</h4>
-                <p className="text-gray-400 font-mono text-sm">Level 42, Cyber Tower<br/>Victoria Island<br/>Lagos, Nigeria</p>
+                <p className="text-gray-400 font-mono text-sm">
+                  Block E37, TIC Complex<br/>
+                  Aim Street, Farm Centre<br/>
+                  Kano City, Nigeria 700001
+                </p>
               </div>
             </div>
 
@@ -62,7 +72,7 @@ const Contact: React.FC = () => {
               </div>
               <div>
                 <h4 className="text-xl font-bold mb-1">Encrypted Mail</h4>
-                <p className="text-gray-400 font-mono text-sm">secure@defendhub.ng<br/>PGP Key: 0x4A2B9F</p>
+                <p className="text-gray-400 font-mono text-sm">info@defendhub.ng<br/>PGP Key: 0x4A2B9F</p>
               </div>
             </div>
             
@@ -71,15 +81,15 @@ const Contact: React.FC = () => {
                 <Phone />
               </div>
               <div>
-                <h4 className="text-xl font-bold mb-1">Emergency Line</h4>
-                <p className="text-gray-400 font-mono text-sm">+234 800 000 0000<br/>(Priority Clients Only)</p>
+                <h4 className="text-xl font-bold mb-1">Company Hotline</h4>
+                <p className="text-gray-400 font-mono text-sm">+234 806 420 0257</p>
               </div>
             </div>
 
             {/* WhatsApp CTA */}
             <div className="pt-8 mt-8 border-t border-white/10">
                 <motion.a 
-                    href="https://wa.me/2348000000000" 
+                    href="https://wa.me/2348064200257" 
                     target="_blank"
                     rel="noopener noreferrer"
                     whileHover={{ scale: 1.02 }}
@@ -103,6 +113,43 @@ const Contact: React.FC = () => {
         >
           <div className="absolute top-0 right-0 w-20 h-20 bg-cyber-red/10 blur-3xl pointer-events-none" />
           
+          {/* Success Overlay Animation */}
+          <AnimatePresence>
+            {isSuccess && (
+              <motion.div
+                initial={{ opacity: 0, backdropFilter: "blur(0px)" }}
+                animate={{ opacity: 1, backdropFilter: "blur(10px)" }}
+                exit={{ opacity: 0, backdropFilter: "blur(0px)" }}
+                className="absolute inset-0 z-50 bg-black/80 flex flex-col items-center justify-center text-center p-6"
+              >
+                <motion.div
+                  initial={{ scale: 0.5, opacity: 0 }}
+                  animate={{ scale: 1, opacity: 1 }}
+                  transition={{ type: "spring", stiffness: 300, damping: 20 }}
+                  className="w-24 h-24 rounded-full border-2 border-cyber-red bg-cyber-red/10 flex items-center justify-center mb-6 shadow-[0_0_30px_rgba(255,26,26,0.3)]"
+                >
+                  <Check className="w-12 h-12 text-cyber-red" />
+                </motion.div>
+                <motion.h3 
+                  initial={{ y: 20, opacity: 0 }}
+                  animate={{ y: 0, opacity: 1 }}
+                  transition={{ delay: 0.2 }}
+                  className="text-3xl font-display font-bold text-white mb-2"
+                >
+                  TRANSMISSION RECEIVED
+                </motion.h3>
+                <motion.p 
+                  initial={{ y: 20, opacity: 0 }}
+                  animate={{ y: 0, opacity: 1 }}
+                  transition={{ delay: 0.3 }}
+                  className="text-gray-400 font-mono text-sm tracking-widest"
+                >
+                  OUR AGENTS WILL DECRYPT YOUR REQUEST SHORTLY.
+                </motion.p>
+              </motion.div>
+            )}
+          </AnimatePresence>
+
           <form onSubmit={handleSubmit} className="space-y-6">
             <div className="space-y-2">
               <label className="text-xs font-mono text-cyber-red tracking-widest">IDENTITY</label>
@@ -190,7 +237,7 @@ const Contact: React.FC = () => {
           marginHeight={0} 
           marginWidth={0} 
           scrolling="no"
-          src="https://maps.google.com/maps?width=100%25&amp;height=600&amp;hl=en&amp;q=Victoria%20Island%20Lagos+(DefendHub)&amp;t=&amp;z=14&amp;ie=UTF8&amp;iwloc=B&amp;output=embed"
+          src="https://maps.google.com/maps?width=100%25&amp;height=600&amp;hl=en&amp;q=Technology%20Incubation%20Centre%20Kano%20Farm%20Centre+(DefendHub)&amp;t=&amp;z=15&amp;ie=UTF8&amp;iwloc=B&amp;output=embed"
           style={{ filter: 'invert(90%) hue-rotate(180deg)' }}
         ></iframe>
       </div>
