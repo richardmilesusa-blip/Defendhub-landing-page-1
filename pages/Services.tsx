@@ -1,8 +1,9 @@
-import React from 'react';
+import React, { useState } from 'react';
 import { motion } from 'framer-motion';
-import { Shield, ClipboardCheck, Cpu, Eye, Code, Wifi } from 'lucide-react';
+import { Shield, ClipboardCheck, Cpu, Eye, Code, Wifi, Download, FileText } from 'lucide-react';
 import { Link } from 'react-router-dom';
 import { Service } from '../types';
+import { jsPDF } from "jspdf";
 
 const services: Service[] = [
   {
@@ -50,20 +51,138 @@ const services: Service[] = [
 ];
 
 const Services: React.FC = () => {
+  const [isGenerating, setIsGenerating] = useState(false);
+
+  const generateCatalog = () => {
+    setIsGenerating(true);
+    const doc = new jsPDF();
+    const primaryColor = [255, 26, 26]; // Cyber Red
+    const darkGray = [40, 40, 40];
+    const black = [0, 0, 0];
+
+    // --- HEADER ---
+    doc.setFillColor(5, 5, 5);
+    doc.rect(0, 0, 210, 40, 'F');
+    
+    doc.setFont("helvetica", "bold");
+    doc.setFontSize(22);
+    doc.setTextColor(255, 26, 26);
+    doc.text("DEFENDHUB", 20, 20);
+
+    doc.setFontSize(10);
+    doc.setTextColor(200, 200, 200);
+    doc.text("NIGERIA // CYBER SECURITY ARCHITECTURE", 20, 26);
+    doc.text("SERVICE CAPABILITY CATALOG // CLASSIFIED", 20, 31);
+
+    // --- WATERMARK ---
+    doc.setTextColor(240, 240, 240);
+    doc.setFontSize(60);
+    doc.text("CONFIDENTIAL", 105, 150, { align: "center", angle: 45 });
+
+    // --- CONTENT LOOP ---
+    let yPos = 55;
+    
+    doc.setFont("courier", "normal");
+    doc.setFontSize(10);
+    doc.setTextColor(0, 0, 0);
+
+    services.forEach((service, index) => {
+        // Page break if needed
+        if (yPos > 250) {
+            doc.addPage();
+            yPos = 30;
+        }
+
+        // Service Title
+        doc.setFont("helvetica", "bold");
+        doc.setFontSize(14);
+        doc.setTextColor(primaryColor[0], primaryColor[1], primaryColor[2]);
+        doc.text(`// 0${index + 1} ${service.title.toUpperCase()}`, 20, yPos);
+        
+        // Icon Marker
+        doc.setDrawColor(primaryColor[0], primaryColor[1], primaryColor[2]);
+        doc.line(20, yPos + 2, 190, yPos + 2);
+
+        yPos += 10;
+
+        // Description
+        doc.setFont("helvetica", "normal");
+        doc.setFontSize(11);
+        doc.setTextColor(50, 50, 50);
+        const splitDesc = doc.splitTextToSize(service.description, 170);
+        doc.text(splitDesc, 20, yPos);
+        
+        yPos += splitDesc.length * 5 + 5;
+
+        // Specs
+        doc.setFont("courier", "normal");
+        doc.setFontSize(10);
+        doc.setTextColor(100, 100, 100);
+        doc.text("SPECS:", 20, yPos);
+        yPos += 5;
+        service.specs.forEach(spec => {
+            doc.text(`[+] ${spec}`, 25, yPos);
+            yPos += 5;
+        });
+
+        yPos += 15; // Spacing between items
+    });
+
+    // --- FOOTER ---
+    const pageHeight = doc.internal.pageSize.height;
+    doc.setFillColor(10, 10, 10);
+    doc.rect(0, pageHeight - 30, 210, 30, 'F');
+    
+    doc.setFontSize(9);
+    doc.setTextColor(150, 150, 150);
+    doc.text("DEFENDHUB HEADQUARTERS", 20, pageHeight - 15);
+    doc.text("Kano, Nigeria | +234 806 420 0257 | info@defendhub.ng", 20, pageHeight - 10);
+    doc.setTextColor(255, 26, 26);
+    doc.text("SECURE. ENCRYPT. DEFEND.", 20, pageHeight - 20);
+
+    doc.save("DEFENDHUB_SERVICE_CATALOG.pdf");
+    setIsGenerating(false);
+  };
+
   return (
     <div className="container mx-auto px-6 py-20">
-      <motion.div 
-        initial={{ opacity: 0, y: 20 }}
-        animate={{ opacity: 1, y: 0 }}
-        className="mb-20 text-center"
-      >
-        <h1 className="text-5xl md:text-7xl font-display font-bold mb-6 text-white">
-          DEFENSE <span className="text-cyber-red">MODULES</span>
-        </h1>
-        <p className="text-gray-400 max-w-2xl mx-auto text-lg font-mono">
-          Deployable security architecture for high-value targets.
-        </p>
-      </motion.div>
+      <div className="flex flex-col md:flex-row justify-between items-end mb-20">
+        <motion.div 
+            initial={{ opacity: 0, y: 20 }}
+            animate={{ opacity: 1, y: 0 }}
+            className="text-center md:text-left"
+        >
+            <h1 className="text-5xl md:text-7xl font-display font-bold mb-6 text-white">
+            DEFENSE <span className="text-cyber-red">MODULES</span>
+            </h1>
+            <p className="text-gray-400 max-w-2xl text-lg font-mono">
+            Deployable security architecture for high-value targets.
+            </p>
+        </motion.div>
+
+        {/* Catalog Download Button */}
+        <motion.button
+            onClick={generateCatalog}
+            disabled={isGenerating}
+            initial={{ opacity: 0, x: 20 }}
+            animate={{ opacity: 1, x: 0 }}
+            whileHover={{ scale: 1.05 }}
+            whileTap={{ scale: 0.95 }}
+            className="mt-8 md:mt-0 flex items-center gap-3 px-6 py-4 bg-white/5 border border-cyber-red/30 hover:bg-cyber-red/10 hover:border-cyber-red text-white transition-all group"
+        >
+            {isGenerating ? (
+                <span className="animate-pulse">GENERATING...</span>
+            ) : (
+                <>
+                    <div className="flex flex-col items-start text-left">
+                        <span className="text-xs font-mono text-gray-400 group-hover:text-cyber-red">FULL SPECS</span>
+                        <span className="font-bold font-display">DOWNLOAD CATALOG</span>
+                    </div>
+                    <FileText className="w-6 h-6 text-cyber-red group-hover:animate-bounce" />
+                </>
+            )}
+        </motion.button>
+      </div>
 
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
         {services.map((service, idx) => (
