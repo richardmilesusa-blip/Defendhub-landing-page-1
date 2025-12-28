@@ -191,6 +191,7 @@ const Contact: React.FC = () => {
                   <option value="Forensic Analysis" className="bg-neutral-900">Forensic Analysis</option>
                   <option value="Secure Software Dev" className="bg-neutral-900">Secure Software Dev</option>
                   <option value="IoT Defense" className="bg-neutral-900">IoT Defense</option>
+                  <option value="Training Courses" className="bg-neutral-900">Training Courses</option>
                   <option value="General Inquiry" className="bg-neutral-900">General Inquiry</option>
                 </select>
                 <ChevronDown className="absolute right-4 top-1/2 transform -translate-y-1/2 w-4 h-4 text-gray-500 pointer-events-none" />
