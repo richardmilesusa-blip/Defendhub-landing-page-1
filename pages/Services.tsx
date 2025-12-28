@@ -91,7 +91,7 @@ const Services: React.FC = () => {
     doc.setFontSize(10);
     doc.setTextColor(0, 0, 0);
 
-    // Defense Modules
+    // Defense Modules (01 - 06)
     mainServices.forEach((service, index) => {
         if (yPos > 240) { doc.addPage(); yPos = 30; }
 
@@ -123,18 +123,36 @@ const Services: React.FC = () => {
         yPos += 15;
     });
 
-    // Training Section in PDF
+    // Training Section (07)
     if (yPos > 200) { doc.addPage(); yPos = 30; }
+
+    const trainingTitle = "// 07 TRAINING COURSES";
+    const trainingDesc = "Empowering your workforce with elite cybersecurity knowledge through hands-on workshops and certifications.";
+
     doc.setFont("helvetica", "bold");
-    doc.setFontSize(16);
+    doc.setFontSize(14);
     doc.setTextColor(primaryColor[0], primaryColor[1], primaryColor[2]);
-    doc.text("// ACADEMY CURRICULUM (COMING SOON)", 20, yPos);
+    doc.text(trainingTitle, 20, yPos);
+
+    doc.setDrawColor(primaryColor[0], primaryColor[1], primaryColor[2]);
+    doc.line(20, yPos + 2, 190, yPos + 2);
     yPos += 10;
-    trainingCourses.forEach((course, i) => {
-        doc.setFontSize(12);
-        doc.setTextColor(0, 0, 0);
-        doc.text(`${i + 1}. ${course}`, 25, yPos);
-        yPos += 8;
+
+    doc.setFont("helvetica", "normal");
+    doc.setFontSize(11);
+    doc.setTextColor(50, 50, 50);
+    const splitTrainingDesc = doc.splitTextToSize(trainingDesc, 170);
+    doc.text(splitTrainingDesc, 20, yPos);
+    yPos += splitTrainingDesc.length * 5 + 5;
+
+    doc.setFont("courier", "normal");
+    doc.setFontSize(10);
+    doc.setTextColor(100, 100, 100);
+    doc.text("SPECS:", 20, yPos);
+    yPos += 5;
+    trainingCourses.forEach(course => {
+        doc.text(`[+] ${course}`, 25, yPos);
+        yPos += 5;
     });
 
     // --- FOOTER ---
